@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "licences": {
+      "$code": {
+        ".read": true,
+        ".write": false
+      }
+    }
+  }
+}

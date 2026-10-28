@@ -1,0 +1,625 @@
+/* ============================================================
+   CAISSE 2.0 — Print Styles
+   Thermal Receipt Tickets: 58mm & 80mm
+   ============================================================ */
+
+/* --- Page Setup (80mm default) --- */
+@page {
+  size: 80mm auto;
+  margin: 0;
+}
+
+/* --- 58mm variant --- */
+@page narrow {
+  size: 58mm auto;
+  margin: 1.5mm;
+}
+
+.print-ticket-58mm {
+  page: narrow;
+  max-width: 54mm;
+}
+
+/* --- Base Print Reset --- */
+@media print {
+  /* Hide everything except the ticket */
+  body > *:not(.print-ticket-wrapper) {
+    display: none !important;
+  }
+
+  .sidebar,
+  .bottom-nav,
+  .toast-container,
+  .splash-screen,
+  .modal-overlay,
+  .payment-panel,
+  .page-header,
+  nav,
+  header,
+  footer,
+  .btn,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset body for print */
+  html, body {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+    font-size: 10px;
+    line-height: 1.3;
+    overflow: visible;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove backgrounds and shadows */
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-color: black !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Ensure ticket wrapper fills the page */
+  .print-ticket-wrapper {
+    display: block !important;
+    position: static;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* ============================================================
+   TICKET STRUCTURE
+   ============================================================ */
+
+/* --- Ticket Container --- */
+.print-ticket {
+  box-sizing: border-box;
+  font-family: 'Courier New', 'Lucida Console', 'Consolas', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: black;
+  background: white;
+  width: 80mm;
+  max-width: 80mm;
+  margin: 0 auto;
+  padding: 2mm 3mm;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Variant for 58mm printers */
+.print-ticket.print-ticket-58mm {
+  max-width: 54mm;
+  font-size: 9px;
+}
+
+/* --- Ticket Header --- */
+.ticket-header {
+  text-align: center;
+  margin-bottom: 4mm;
+}
+
+.ticket-company-name {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1mm;
+}
+
+.print-ticket-58mm .ticket-company-name {
+  font-size: 12px;
+}
+
+.print-ticket p,
+.print-ticket td,
+.print-ticket th,
+.print-ticket .ticket-line,
+.print-ticket .ticket-company-name,
+.print-ticket .ticket-company-address,
+.print-ticket .ticket-company-phone,
+.print-ticket .ticket-developer-info {
+  font-weight: 700;
+}
+
+.ticket-company-address {
+  font-size: 9px;
+  margin-bottom: 0.5mm;
+}
+
+.ticket-company-phone {
+  font-size: 9px;
+  margin-bottom: 0.5mm;
+}
+
+.ticket-company-tax-id {
+  font-size: 8px;
+  margin-bottom: 2mm;
+}
+
+.ticket-receipt-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 2mm 0;
+}
+
+.print-ticket-58mm .ticket-receipt-title {
+  font-size: 10px;
+}
+
+/* --- Ticket Meta --- */
+.ticket-meta {
+  font-size: 9px;
+  margin-bottom: 3mm;
+}
+
+.ticket-meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5mm;
+}
+
+.ticket-meta-label {
+  font-weight: 700;
+}
+
+.ticket-meta-value {
+  text-align: right;
+}
+
+/* --- Ticket Divider --- */
+.ticket-divider {
+  border: none;
+  border-top: 1px dashed black;
+  margin: 2mm 0;
+}
+
+.ticket-divider-double {
+  border: none;
+  border-top: 1px double black;
+  margin: 2mm 0;
+}
+
+.ticket-divider-stars {
+  text-align: center;
+  font-size: 9px;
+  margin: 1.5mm 0;
+  letter-spacing: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticket-divider-stars::before {
+  content: '********************************';
+}
+
+.print-ticket-58mm .ticket-divider-stars::before {
+  content: '************************';
+}
+
+/* --- Ticket Items Table --- */
+.ticket-items {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+  margin-bottom: 1mm;
+}
+
+.ticket-items thead th {
+  text-align: left;
+  font-weight: 700;
+  padding: 0.5mm 0;
+  border-bottom: 1px solid black;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.ticket-items thead th:last-child {
+  text-align: right;
+}
+
+.ticket-items thead th.col-qty {
+  text-align: center;
+  width: 12%;
+}
+
+.ticket-items thead th.col-price {
+  text-align: right;
+  width: 22%;
+}
+
+.ticket-items thead th.col-total {
+  text-align: right;
+  width: 24%;
+}
+
+.ticket-items tbody td {
+  padding: 0.5mm 0;
+  vertical-align: top;
+  font-size: 9px;
+}
+
+.ticket-items tbody td:last-child {
+  text-align: right;
+}
+
+.ticket-items tbody td.col-qty {
+  text-align: center;
+}
+
+.ticket-items tbody td.col-price {
+  text-align: right;
+}
+
+.ticket-items tbody td.col-total {
+  text-align: right;
+  font-weight: 700;
+}
+
+.ticket-items tbody .item-name {
+  font-weight: 600;
+}
+
+.ticket-items tbody .item-detail {
+  font-size: 8px;
+  padding-left: 2mm;
+}
+
+/* Multi-line item: name on first row, qty x price = total on second row */
+.ticket-item-calc {
+  font-size: 8px;
+  text-align: right;
+  padding-left: 2mm;
+}
+
+/* --- Ticket Totals --- */
+.ticket-totals {
+  margin: 2mm 0;
+}
+
+.ticket-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.3mm 0;
+  font-size: 9px;
+}
+
+.ticket-total-row .label {
+  text-align: left;
+}
+
+.ticket-total-row .dots {
+  flex: 1;
+  border-bottom: 1px dotted black;
+  margin: 0 1mm;
+  min-width: 5mm;
+}
+
+.ticket-total-row .value {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ticket-total-row.subtotal {
+  font-size: 9px;
+}
+
+.ticket-total-row.discount {
+  font-size: 9px;
+}
+
+.ticket-total-row.tax {
+  font-size: 9px;
+}
+
+.ticket-total-row.grand-total {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1mm 0;
+  border-top: 1px double black;
+  border-bottom: 1px double black;
+  margin: 1mm 0;
+}
+
+.print-ticket-58mm .ticket-total-row.grand-total {
+  font-size: 10px;
+}
+
+.ticket-total-row.payment {
+  font-size: 9px;
+  margin-top: 1mm;
+}
+
+.ticket-total-row.change {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* --- Ticket Payment Info --- */
+.ticket-payment {
+  margin: 2mm 0;
+}
+
+.ticket-payment-method {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.5mm;
+}
+
+/* --- Ticket Barcode / QR placeholder --- */
+.ticket-barcode {
+  text-align: center;
+  margin: 3mm 0;
+}
+
+.ticket-barcode img {
+  max-width: 60%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.ticket-barcode-number {
+  font-size: 8px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-top: 1mm;
+}
+
+/* --- Ticket Footer --- */
+.ticket-footer {
+  text-align: center;
+  margin-top: 4mm;
+  padding-top: 2mm;
+}
+
+.ticket-developer-info {
+  border: 1px solid black;
+  padding: 2mm 1mm;
+  margin-bottom: 3mm;
+  text-align: center;
+}
+
+.ticket-developer-info p {
+  margin: 0.5mm 0;
+}
+
+.ticket-developer-separator {
+  border-top: 1px dashed black;
+  margin: 3mm 0;
+}
+
+.ticket-thank-you {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1mm;
+}
+
+.print-ticket-58mm .ticket-thank-you {
+  font-size: 9px;
+}
+
+.ticket-goodbye {
+  font-size: 8px;
+  margin-bottom: 1mm;
+}
+
+.ticket-legal {
+  font-size: 7px;
+  margin-top: 2mm;
+  line-height: 1.2;
+}
+
+.ticket-datetime {
+  font-size: 8px;
+  margin-top: 1mm;
+}
+
+/* --- Ticket Number / Reference --- */
+.ticket-number {
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  margin: 1mm 0;
+  letter-spacing: 0.5px;
+}
+
+/* --- Return / Refund ticket variant --- */
+.ticket-return .ticket-receipt-title {
+  text-decoration: underline;
+}
+
+.ticket-return .ticket-total-row.grand-total {
+  text-decoration: underline;
+}
+
+/* --- Void ticket --- */
+.ticket-void {
+  position: relative;
+}
+
+.ticket-void::after {
+  content: 'ANNULÉ';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  opacity: 0.15;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* --- Cash register close ticket (Z report) --- */
+.ticket-z-report .ticket-receipt-title {
+  letter-spacing: 1px;
+}
+
+.ticket-z-report .report-section-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 2mm 0 1mm 0;
+  text-decoration: underline;
+}
+
+.ticket-z-report .report-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  padding: 0.3mm 0;
+}
+
+.ticket-z-report .report-row .label {
+  text-align: left;
+}
+
+.ticket-z-report .report-row .value {
+  text-align: right;
+  font-weight: 700;
+}
+
+.ticket-z-report .report-row.report-total {
+  font-weight: 700;
+  border-top: 1px solid black;
+  padding-top: 1mm;
+  margin-top: 1mm;
+}
+
+/* --- Utility: Force page break --- */
+.ticket-page-break {
+  page-break-after: always;
+  break-after: page;
+}
+
+/* --- No page breaks inside ticket --- */
+.print-ticket {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* --- Ensure crisp text --- */
+@media print {
+  .print-ticket {
+    -webkit-font-smoothing: none;
+    text-rendering: geometricPrecision;
+  }
+
+  .print-ticket * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Cut line indicator */
+  .ticket-cut-line {
+    border-top: 1px dashed black;
+    margin: 3mm 0;
+    position: relative;
+  }
+
+  .ticket-cut-line::after {
+    content: '✂';
+    position: absolute;
+    top: -6px;
+    left: -2mm;
+    font-size: 8px;
+  }
+}
+
+/* ============================================================
+   SCREEN PREVIEW (for viewing ticket on screen before print)
+   ============================================================ */
+@media screen {
+  .print-ticket-wrapper {
+    display: none;
+  }
+
+  .print-ticket-preview {
+    display: block;
+    background: white;
+    color: black;
+    max-width: 80mm;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .print-ticket-preview .print-ticket {
+    color: black;
+    background: white;
+  }
+
+  .print-ticket-preview .print-ticket * {
+    color: black !important;
+    background: transparent !important;
+  }
+}
+
+/* --- 80mm print readability --- */
+@media print {
+  .print-ticket {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .print-ticket .ticket-header,
+  .print-ticket .ticket-info,
+  .print-ticket .ticket-totals,
+  .print-ticket .ticket-footer {
+    font-size: 12px;
+  }
+
+  .print-ticket .ticket-company-name {
+    font-size: 16px;
+  }
+
+  .print-ticket .ticket-company-address,
+  .print-ticket .ticket-company-phone,
+  .print-ticket .ticket-developer-info,
+  .print-ticket .ticket-footer p {
+    font-size: 12px;
+  }
+
+  .print-ticket .ticket-items {
+    font-size: 12px;
+  }
+
+  .print-ticket .ticket-items thead th,
+  .print-ticket .ticket-items tbody td {
+    font-size: 12px;
+  }
+
+  .print-ticket .ticket-line {
+    font-size: 12px;
+    padding: 0.7mm 0;
+  }
+
+  .print-ticket .ticket-line-bold {
+    font-size: 14px;
+  }
+}

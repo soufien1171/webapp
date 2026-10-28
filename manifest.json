@@ -1,0 +1,27 @@
+{
+    "name": "Caisse 2.0 — Système de Caisse POS",
+    "short_name": "Caisse 2.0",
+    "description": "Application de caisse point de vente moderne avec synchronisation cloud",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#0f172a",
+    "background_color": "#0f172a",
+    "lang": "fr",
+    "dir": "ltr",
+    "categories": ["business", "finance"],
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

@@ -34,6 +34,7 @@ export function renderLayout(pageContainer) {
                     </div>
                     <span class="font-bold text-lg text-primary tracking-wide">Caisse 2.0</span>
                 </div>
+                <button type="button" class="btn btn-ghost btn-sm btn-sidebar-toggle" aria-label="Masquer le menu" title="Masquer le menu">☰</button>
             </div>
 
             <!-- Employee Info badge -->
@@ -173,16 +174,30 @@ export function renderLayout(pageContainer) {
         }
     });
 
-    // Mobile sidebar toggle
+    // Sidebar toggle — button moves between sidebar and header
     const sidebar = layout.querySelector('.sidebar');
-    const mobileBtn = layout.querySelector('.btn-mobile-menu');
+    const headerToggleBtn = layout.querySelector('.btn-mobile-menu');
+    const sidebarToggleBtn = layout.querySelector('.btn-sidebar-toggle');
 
-    const toggleSidebar = () => {
-        const isExpanded = sidebar.classList.toggle('sidebar-hidden') === false;
-        mobileBtn.setAttribute('aria-expanded', String(isExpanded));
+    const updateToggleVisibility = () => {
+        const isHidden = sidebar.classList.contains('sidebar-hidden');
+        // When sidebar is hidden → show the header button, hide the sidebar button
+        // When sidebar is visible → show the sidebar button, hide the header button
+        headerToggleBtn.style.display = isHidden ? '' : 'none';
+        sidebarToggleBtn.style.display = isHidden ? 'none' : '';
+        headerToggleBtn.setAttribute('aria-expanded', String(!isHidden));
     };
 
-    mobileBtn?.addEventListener('click', toggleSidebar);
+    const toggleSidebar = () => {
+        sidebar.classList.toggle('sidebar-hidden');
+        updateToggleVisibility();
+    };
+
+    headerToggleBtn?.addEventListener('click', toggleSidebar);
+    sidebarToggleBtn?.addEventListener('click', toggleSidebar);
+
+    // Set initial state
+    updateToggleVisibility();
 
     // Attach page element
     layout.querySelector('.page-slot').appendChild(pageContainer);

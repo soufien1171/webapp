@@ -487,6 +487,13 @@ code {
   flex-shrink: 0;
 }
 
+/* Toggle button inside sidebar header */
+.btn-sidebar-toggle {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 @media (min-width: 641px) {
   .btn-mobile-menu {
     display: flex;

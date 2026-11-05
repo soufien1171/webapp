@@ -8,6 +8,7 @@ import { processImageFile } from '../helpers/image-helper.js';
 import { createDataGrid } from '../components/data-grid.js';
 import { showModal, confirmDialog } from '../components/modal.js';
 import { toast } from '../components/toast.js';
+import { startScanning, stopScanning } from '../helpers/scanner.js';
 
 export function renderProduitsPage() {
     const page = document.createElement('div');
@@ -197,7 +198,11 @@ export function renderProduitsPage() {
                         <div class="flex gap-1">
                             <input type="text" id="p-code" class="form-input flex-1 font-mono text-sm" 
                                 value="${existingProd?.code_barre || ''}" required ${isEdit ? 'readonly' : ''} />
-                            ${!isEdit ? `<button type="button" class="btn btn-secondary btn-sm btn-gen-ean" title="Générer code EAN-13">🎲 EAN</button>` : ''}
+                            ${!isEdit ? `<button type="button" class="btn btn-secondary btn-sm btn-gen-ean" title="Générer code EAN-13">🎲 EAN</button><button type="button" class="btn btn-secondary btn-sm btn-scan-product" title="Scanner avec la caméra">📷 Scanner</button>` : ''}
+                        </div>
+                        <div id="product-camera-wrapper" class="hidden mt-2">
+                            <div id="product-camera-view" style="width:100%;max-width:480px;margin:0 auto"></div>
+                            <button type="button" class="btn btn-ghost btn-sm btn-stop-product-camera">Fermer la caméra</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -283,6 +288,26 @@ export function renderProduitsPage() {
             });
         }
 
+        const cameraWrapper = container.querySelector('#product-camera-wrapper');
+        const stopProductCamera = async () => {
+            await stopScanning();
+            cameraWrapper.classList.add('hidden');
+        };
+        container.querySelector('.btn-scan-product')?.addEventListener('click', async () => {
+            cameraWrapper.classList.remove('hidden');
+            try {
+                await startScanning('product-camera-view', (code) => {
+                    container.querySelector('#p-code').value = code.trim();
+                    toast.success('Code-barres détecté.');
+                    stopProductCamera();
+                }, { fps: 24 });
+            } catch (err) {
+                cameraWrapper.classList.add('hidden');
+                toast.error(err.message);
+            }
+        });
+        container.querySelector('.btn-stop-product-camera')?.addEventListener('click', stopProductCamera);
+
         // Image upload
         container.querySelector('#p-img-file').addEventListener('change', async (e) => {
             const file = e.target.files?.[0];
@@ -300,8 +325,10 @@ export function renderProduitsPage() {
         showModal({
             title: isEdit ? "Modifier l'Article" : "Nouvel Article",
             content: container,
+            onCancel: stopProductCamera,
             confirmText: isEdit ? "Enregistrer" : "Créer",
             onConfirm: async () => {
+                await stopProductCamera();
                 const code = container.querySelector('#p-code').value.trim();
                 const nom = container.querySelector('#p-nom').value.trim();
                 const pxVente = parseFloat(container.querySelector('#p-prix-vente').value) || 0;

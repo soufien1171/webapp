@@ -19,8 +19,8 @@ export async function startScanning(containerId, onDetected, options = {}) {
     const config = {
         fps: options.fps || 20,
         qrbox: options.qrbox || ((viewfinderWidth, viewfinderHeight) => ({
-            width: Math.min(viewfinderWidth * 0.9, 520),
-            height: Math.min(viewfinderHeight * 0.55, 220)
+            width: Math.min(viewfinderWidth * 0.88, 360),
+            height: Math.min(viewfinderHeight * 0.3, 110)
         })),
         aspectRatio: options.aspectRatio || 1.777,
         experimentalFeatures: { useBarCodeDetectorIfSupported: true },
@@ -30,8 +30,8 @@ export async function startScanning(containerId, onDetected, options = {}) {
             Html5QrcodeSupportedFormats.CODE_128,
             Html5QrcodeSupportedFormats.QR_CODE,
             Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A
-            ,Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
             Html5QrcodeSupportedFormats.EAN_2,
             Html5QrcodeSupportedFormats.EAN_5,
             Html5QrcodeSupportedFormats.CODE_39,

@@ -159,6 +159,11 @@ export function renderLayout(pageContainer) {
     // Highlight active link
     const currentHash = window.location.hash || '#/caisse';
     layout.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.matchMedia('(max-width: 640px)').matches) {
+                sidebar.classList.add('sidebar-hidden');
+            }
+        });
         if (item.getAttribute('href') === currentHash) {
             item.classList.add('active');
         }
@@ -176,6 +181,9 @@ export function renderLayout(pageContainer) {
 
     // Sidebar toggle — button moves between sidebar and header
     const sidebar = layout.querySelector('.sidebar');
+    if (window.matchMedia('(max-width: 640px)').matches) {
+        sidebar.classList.add('sidebar-hidden');
+    }
     const headerToggleBtn = layout.querySelector('.btn-mobile-menu');
     const sidebarToggleBtn = layout.querySelector('.btn-sidebar-toggle');
 

@@ -9,6 +9,8 @@ import * as caisseRepo from '../db/repositories/caisse-repo.js';
 
 export function renderLayout(pageContainer) {
     const app = document.getElementById('app');
+    const hideSidebarAfterNavigation = sessionStorage.getItem('hide-sidebar-after-navigation') === '1';
+    sessionStorage.removeItem('hide-sidebar-after-navigation');
     app.innerHTML = '';
 
     const employee = getEmployeeSession() || { nom: "Utilisateur", prenom: "", role: 1 };
@@ -160,9 +162,9 @@ export function renderLayout(pageContainer) {
     const currentHash = window.location.hash || '#/caisse';
     layout.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
-            if (window.matchMedia('(max-width: 640px)').matches) {
-                sidebar.classList.add('sidebar-hidden');
-            }
+            sessionStorage.setItem('hide-sidebar-after-navigation', '1');
+            sidebar.classList.add('sidebar-hidden');
+            updateToggleVisibility();
         });
         if (item.getAttribute('href') === currentHash) {
             item.classList.add('active');
@@ -181,7 +183,7 @@ export function renderLayout(pageContainer) {
 
     // Sidebar toggle — button moves between sidebar and header
     const sidebar = layout.querySelector('.sidebar');
-    if (window.matchMedia('(max-width: 640px)').matches) {
+    if (hideSidebarAfterNavigation || window.matchMedia('(max-width: 640px)').matches) {
         sidebar.classList.add('sidebar-hidden');
     }
     const headerToggleBtn = layout.querySelector('.btn-mobile-menu');

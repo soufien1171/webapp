@@ -7,6 +7,21 @@ import { setupAuthListener, setEmployeeSession } from './auth.js';
 import * as utilisateurRepo from './db/repositories/utilisateur-repo.js';
 import { verifyStoredLicence } from './helpers/firebase-licence.js';
 
+async function loadFirebaseModules() {
+    try {
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
+        const { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js');
+        const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js');
+        const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js');
+
+        window.__FIREBASE_MODULES__ = { initializeApp, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, collection, getDocs, getAuth, getDatabase, ref, get };
+        window.__AUTH_METHODS__ = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged };
+        console.log('[App] Firebase modules loaded from CDN.');
+    } catch (err) {
+        console.warn('[Firebase] CDN non accessible ou mode hors-ligne pur. La caisse fonctionne en stockage local sécurisé.');
+    }
+}
+
 async function bootstrap() {
     console.log('[App] Initializing Caisse 2.0 PWA...');
 
@@ -29,7 +44,9 @@ async function bootstrap() {
 
     await initTheme();
 
-    // 3. Attempt Firebase setup (graceful fallback if offline or no credentials)
+    // 3. Load Firebase modules first, then attempt setup (guarantees ordering)
+    await loadFirebaseModules();
+
     try {
         if (window.__FIREBASE_MODULES__) {
             await initFirebase();

@@ -27,20 +27,7 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/print.css" media="print">
 
-    <!-- Firebase SDK v10 (Modular CDN with graceful offline fallback) -->
-    <script type="module">
-        try {
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js');
-            const { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js');
-            const { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js');
-            const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js');
-
-            window.__FIREBASE_MODULES__ = { initializeApp, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, collection, getDocs, getAuth, getDatabase, ref, get };
-            window.__AUTH_METHODS__ = { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged };
-        } catch (err) {
-            console.warn('[Firebase] CDN non accessible ou mode hors-ligne pur. La caisse fonctionne en stockage local sécurisé.');
-        }
-    </script>
+    <!-- Firebase SDK v10 (loaded in app.js to guarantee ordering) -->
 
     <!-- html5-qrcode (barcode scanner) -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>

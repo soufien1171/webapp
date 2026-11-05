@@ -5,6 +5,10 @@ let currentGoogleUser = null;
 let currentEmployee = null;
 
 export function setupAuthListener(callback) {
+    if (!window.__AUTH_METHODS__) {
+        console.warn('[Auth] Firebase Auth non disponible, listener ignoré.');
+        return;
+    }
     const { onAuthStateChanged } = window.__AUTH_METHODS__;
     const auth = getAuthInstance();
     onAuthStateChanged(auth, (user) => {
@@ -14,8 +18,14 @@ export function setupAuthListener(callback) {
 }
 
 export async function signInWithGoogle() {
+    if (!window.__AUTH_METHODS__) {
+        throw new Error('Firebase non chargé. Vérifiez votre connexion internet et rechargez la page.');
+    }
     const { signInWithPopup, GoogleAuthProvider } = window.__AUTH_METHODS__;
     const auth = getAuthInstance();
+    if (!auth) {
+        throw new Error('Firebase Auth non initialisé. Rechargez la page.');
+    }
     const provider = new GoogleAuthProvider();
     try {
         const result = await signInWithPopup(auth, provider);

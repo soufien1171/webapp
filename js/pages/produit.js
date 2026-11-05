@@ -30,6 +30,10 @@ export function renderProduitsPage() {
             </div>
         </div>
 
+        <div id="catalogues-prerequis" class="card p-3 text-warning hidden" role="alert" aria-live="polite">
+            Il est nécessaire d'ajouter les fournisseurs et les catégories d'articles avant d'ajouter les articles.
+        </div>
+
         <!-- Inventory Valuation & Alert Badges -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="stat-card">
@@ -63,6 +67,7 @@ export function renderProduitsPage() {
     const badgeLowStock = page.querySelector('#badge-low-stock');
     const badgeExp = page.querySelector('#badge-exp');
     const gridSlot = page.querySelector('#prods-grid-slot');
+    const prerequisiteNotice = page.querySelector('#catalogues-prerequis');
 
     let gridInstance = null;
 
@@ -70,6 +75,7 @@ export function renderProduitsPage() {
         allProducts = await produitRepo.getAll();
         allCategories = await categorieRepo.getAll();
         allFournisseurs = await fournisseurRepo.getAll();
+        prerequisiteNotice.classList.toggle('hidden', allCategories.length > 0 && allFournisseurs.length > 0);
         updateStats();
         renderGrid();
     }
@@ -388,6 +394,11 @@ export function renderProduitsPage() {
     }
 
     page.querySelector('.btn-add-prod').addEventListener('click', () => {
+        if (allCategories.length === 0 || allFournisseurs.length === 0) {
+            prerequisiteNotice.classList.remove('hidden');
+            prerequisiteNotice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return;
+        }
         openProductModal();
     });
 

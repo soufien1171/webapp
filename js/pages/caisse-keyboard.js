@@ -54,7 +54,7 @@ export function renderCaisseKeyboardPage() {
                 <span class="text-sm font-semibold">Caméra active — Visez le code-barres</span>
                 <button type="button" class="btn btn-ghost btn-sm btn-close-camera">&times;</button>
             </div>
-            <div id="camera-scanner-view" style="width: 100%; max-width: 360px; max-height: 180px; overflow: hidden; margin: 0 auto;"></div>
+            <div id="camera-scanner-view" style="width: 100%; max-width: 480px; margin: 0 auto;"></div>
         </div>
 
         <!-- Main Workspace (Cart table on left + Totals & Numpad on right) -->
@@ -334,7 +334,7 @@ export function renderCaisseKeyboardPage() {
                     stopScanning();
                     cameraWrapper.classList.add('hidden');
                     handleBarcode(decodedCode);
-                }, { qrbox: (width, height) => ({ width: Math.min(width * 0.88, 360), height: Math.min(height * 0.3, 100) }) });
+                }, { qrbox: (width, height) => ({ width: Math.min(width * 0.88, 420), height: Math.min(height * 0.3, 120) }) });
             } catch (err) {
                 toast.error(err.message);
                 cameraWrapper.classList.add('hidden');

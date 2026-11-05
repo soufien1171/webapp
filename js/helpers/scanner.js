@@ -16,6 +16,10 @@ export async function startScanning(containerId, onDetected, options = {}) {
         await stopScanning();
     }
 
+    if (typeof window.Html5Qrcode !== 'function' || !window.Html5QrcodeSupportedFormats) {
+        throw new Error('Le module de lecture caméra est indisponible. Vérifiez la connexion puis rechargez la page.');
+    }
+
     const config = {
         fps: options.fps || 20,
         qrbox: options.qrbox || ((viewfinderWidth, viewfinderHeight) => ({
@@ -32,8 +36,6 @@ export async function startScanning(containerId, onDetected, options = {}) {
             Html5QrcodeSupportedFormats.EAN_8,
             Html5QrcodeSupportedFormats.UPC_A,
             Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.EAN_2,
-            Html5QrcodeSupportedFormats.EAN_5,
             Html5QrcodeSupportedFormats.CODE_39,
             Html5QrcodeSupportedFormats.CODE_93,
             Html5QrcodeSupportedFormats.ITF,
@@ -41,7 +43,7 @@ export async function startScanning(containerId, onDetected, options = {}) {
         ]
     };
 
-    scanner = new Html5Qrcode(containerId);
+    scanner = new window.Html5Qrcode(containerId);
 
     try {
         await scanner.start(
@@ -62,6 +64,7 @@ export async function startScanning(containerId, onDetected, options = {}) {
         isScanning = true;
     } catch (err) {
         console.error('[Scanner] Failed to start:', err);
+        scanner = null;
         throw new Error('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
     }
 }

@@ -289,6 +289,15 @@ export function renderProduitsPage() {
         }
 
         const cameraWrapper = container.querySelector('#product-camera-wrapper');
+        const productCodeInput = container.querySelector('#p-code');
+        // Les lecteurs USB/Bluetooth se comportent comme un clavier et terminent
+        // généralement la saisie par Entrée.
+        productCodeInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                productCodeInput.value = productCodeInput.value.trim();
+            }
+        });
         const stopProductCamera = async () => {
             await stopScanning();
             cameraWrapper.classList.add('hidden');

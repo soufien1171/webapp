@@ -3092,19 +3092,9 @@ code {
   }
 
   .page-slot::-webkit-scrollbar,
-  .sidebar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .table-responsive {
-    overflow-x: auto;
-    scrollbar-width: thin;
-    -ms-overflow-style: auto;
-  }
-
+  .sidebar::-webkit-scrollbar,
   .table-responsive::-webkit-scrollbar {
-    display: block;
-    height: 6px;
+    display: none;
   }
 
   .caisse-keyboard-view,

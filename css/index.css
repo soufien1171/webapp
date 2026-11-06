@@ -1553,7 +1553,6 @@ code {
 .data-table tbody td {
   padding: var(--space-3) var(--space-4);
   color: var(--text-secondary);
-  vertical-align: middle;
 }
 
 .data-table td.col-numeric {
@@ -3093,9 +3092,19 @@ code {
   }
 
   .page-slot::-webkit-scrollbar,
-  .sidebar::-webkit-scrollbar,
-  .table-responsive::-webkit-scrollbar {
+  .sidebar::-webkit-scrollbar {
     display: none;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -ms-overflow-style: auto;
+  }
+
+  .table-responsive::-webkit-scrollbar {
+    display: block;
+    height: 6px;
   }
 
   .caisse-keyboard-view,

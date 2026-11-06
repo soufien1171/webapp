@@ -1,106 +1,99 @@
-// Scanner Helper — Scanbot Web SDK Custom UI wrapper
+// Scanner Helper — ZXing browser wrapper
 
-let scanbotSdkPromise = null;
-let scanner = null;
+let reader = null;
+let controls = null;
+let videoElement = null;
 let isScanning = false;
 let scanRequest = 0;
 
-const SCANBOT_ENGINE_PATH =
-    'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@10.0.0/bundle/bin/complete/';
-
-async function getScanbotSdk() {
-    if (scanbotSdkPromise) return scanbotSdkPromise;
-
-    scanbotSdkPromise = (async () => {
-        if (!window.ScanbotSDK?.initialize) {
-            throw new Error('Le SDK Scanbot est indisponible. Vérifiez la connexion puis rechargez la page.');
-        }
-
-        const licenseKey = window.__CAISSE_CONFIG__?.scanbotLicenseKey || '';
-        return window.ScanbotSDK.initialize({ licenseKey, enginePath: SCANBOT_ENGINE_PATH });
-    })().catch(error => {
-        scanbotSdkPromise = null;
-        throw error;
-    });
-
-    return scanbotSdkPromise;
-}
-
 /**
- * Start barcode scanning via Scanbot Custom UI.
- * @param {string} containerId - DOM element ID for camera preview
+ * Start barcode scanning through the camera.
+ * @param {string} containerId - DOM element ID for the camera preview
  * @param {Function} onDetected - callback(decodedText)
  * @param {Object} options
  */
 export async function startScanning(containerId, onDetected, options = {}) {
     if (isScanning) return;
+
+    if (!window.ZXingBrowser?.BrowserMultiFormatReader) {
+        throw new Error('Le scanner ZXing est indisponible. Vérifiez la connexion puis rechargez la page.');
+    }
+
+    const container = document.getElementById(containerId);
+    if (!container) throw new Error('Conteneur de caméra introuvable.');
+
+    await stopScanning();
     isScanning = true;
     const requestId = ++scanRequest;
+
+    reader = new window.ZXingBrowser.BrowserMultiFormatReader();
+    videoElement = document.createElement('video');
+    videoElement.autoplay = true;
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+    videoElement.style.width = '100%';
+    videoElement.style.height = '100%';
+    videoElement.style.objectFit = 'cover';
+    container.replaceChildren(videoElement);
+
     try {
-        const sdk = await getScanbotSdk();
-        const configuration = {
-            containerId,
-            showFinder: true,
-            captureDelay: options.captureDelay || 1000,
-            videoConstraints: {
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                facingMode: 'environment'
+        const createdControls = await reader.decodeFromConstraints(
+            {
+                video: {
+                    facingMode: options.facingMode || 'environment',
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
             },
-            onBarcodesDetected: (result) => {
-                if (requestId !== scanRequest) return;
-                const barcode = result?.barcodes?.[0];
-                if (!barcode?.text) return;
+            videoElement,
+            (result) => {
+                if (requestId !== scanRequest || !result) return;
+                const text = result.getText();
+                if (!text) return;
 
-                scanner?.dispose();
-                scanner = null;
-                isScanning = false;
-                onDetected(barcode.text);
-            },
-            onError: (error) => {
-                console.error('[Scanner] Scanbot camera error:', error);
+                const detectedCallback = onDetected;
+                void stopScanning();
+                detectedCallback(text);
             }
-        };
-
-        const createdScanner = await sdk.createBarcodeScanner(configuration);
+        );
         if (requestId !== scanRequest) {
-            createdScanner.dispose();
+            createdControls.stop();
             return;
         }
-        scanner = createdScanner;
+        controls = createdControls;
     } catch (error) {
-        console.error('[Scanner] Scanbot failed:', error);
-        scanner = null;
-        isScanning = false;
+        await stopScanning();
+        console.error('[Scanner] ZXing failed:', error);
         throw new Error('Impossible de démarrer le scanner. Vérifiez les permissions de la caméra.');
     }
 }
 
-/**
- * Stop scanning
- */
+/** Stop camera decoding and release the media stream. */
 export async function stopScanning() {
     scanRequest += 1;
-    if (scanner) {
-        scanner.dispose();
-        scanner = null;
+
+    if (controls) {
+        controls.stop();
+        controls = null;
     }
+
+    if (videoElement?.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    videoElement?.remove();
+    videoElement = null;
+    reader = null;
     isScanning = false;
 }
 
-/**
- * Check if scanning is currently active
- */
 export function isScannerActive() {
     return isScanning;
 }
 
-/**
- * Get available cameras
- */
 export async function getCameras() {
     try {
-        return scanner ? await scanner.fetchAvailableCameras() : [];
+        return await window.ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
     } catch {
         return [];
     }

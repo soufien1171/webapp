@@ -1,9 +1,29 @@
-// Scanner Helper — html5-qrcode wrapper
+// Scanner Helper — Scanbot Web SDK RTU UI wrapper
 
-let scanner = null;
+let scanbotSdkPromise = null;
 let isScanning = false;
-let debounceTimer = null;
-const DEBOUNCE_MS = 1500;
+let scanRequest = 0;
+
+const SCANBOT_ENGINE_PATH =
+    'https://cdn.jsdelivr.net/npm/scanbot-web-sdk@10.0.0/bundle/bin/complete/';
+
+async function getScanbotSdk() {
+    if (scanbotSdkPromise) return scanbotSdkPromise;
+
+    scanbotSdkPromise = (async () => {
+        if (!window.ScanbotSDK?.initialize) {
+            throw new Error('Le SDK Scanbot est indisponible. Vérifiez la connexion puis rechargez la page.');
+        }
+
+        const licenseKey = window.__CAISSE_CONFIG__?.scanbotLicenseKey || '';
+        return window.ScanbotSDK.initialize({ licenseKey, enginePath: SCANBOT_ENGINE_PATH });
+    })().catch(error => {
+        scanbotSdkPromise = null;
+        throw error;
+    });
+
+    return scanbotSdkPromise;
+}
 
 /**
  * Start barcode scanning via camera
@@ -11,61 +31,22 @@ const DEBOUNCE_MS = 1500;
  * @param {Function} onDetected - callback(decodedText)
  * @param {Object} options
  */
-export async function startScanning(containerId, onDetected, options = {}) {
-    if (isScanning) {
-        await stopScanning();
-    }
-
-    if (typeof window.Html5Qrcode !== 'function' || !window.Html5QrcodeSupportedFormats) {
-        throw new Error('Le module de lecture caméra est indisponible. Vérifiez la connexion puis rechargez la page.');
-    }
-
-    const config = {
-        fps: options.fps || 20,
-        qrbox: options.qrbox || ((viewfinderWidth, viewfinderHeight) => ({
-            width: Math.min(viewfinderWidth * 0.88, 360),
-            height: Math.min(viewfinderHeight * 0.3, 110)
-        })),
-        aspectRatio: options.aspectRatio || 1.777,
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-        videoConstraints: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
-        formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.QR_CODE,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.CODE_93,
-            Html5QrcodeSupportedFormats.ITF,
-            Html5QrcodeSupportedFormats.CODABAR
-        ]
-    };
-
-    scanner = new window.Html5Qrcode(containerId);
-
+export async function startScanning(_containerId, onDetected, _options = {}) {
+    if (isScanning) return;
+    isScanning = true;
+    const requestId = ++scanRequest;
     try {
-        await scanner.start(
-            { facingMode: "environment" },
-            config,
-            (decodedText) => {
-                // Debounce to avoid multiple rapid scans
-                if (debounceTimer) return;
-                debounceTimer = setTimeout(() => {
-                    debounceTimer = null;
-                }, DEBOUNCE_MS);
-                onDetected(decodedText);
-            },
-            (errorMessage) => {
-                // Scan error — ignore (continuous scanning)
-            }
-        );
-        isScanning = true;
-    } catch (err) {
-        console.error('[Scanner] Failed to start:', err);
-        scanner = null;
-        throw new Error('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
+        await getScanbotSdk();
+        const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
+        const result = await window.ScanbotSDK.UI.createBarcodeScanner(config);
+        if (requestId !== scanRequest || !result?.items?.length) return;
+        const barcode = result.items[0]?.barcode;
+        if (barcode?.text) onDetected(barcode.text);
+    } catch (error) {
+        console.error('[Scanner] Scanbot failed:', error);
+        throw new Error('Impossible de démarrer le scanner. Vérifiez les permissions de la caméra.');
+    } finally {
+        if (requestId === scanRequest) isScanning = false;
     }
 }
 
@@ -73,19 +54,8 @@ export async function startScanning(containerId, onDetected, options = {}) {
  * Stop scanning
  */
 export async function stopScanning() {
-    if (scanner && isScanning) {
-        try {
-            await scanner.stop();
-        } catch (e) {
-            // ignore
-        }
-        scanner.clear();
-        isScanning = false;
-    }
-    if (debounceTimer) {
-        clearTimeout(debounceTimer);
-        debounceTimer = null;
-    }
+    scanRequest += 1;
+    isScanning = false;
 }
 
 /**
@@ -99,9 +69,5 @@ export function isScannerActive() {
  * Get available cameras
  */
 export async function getCameras() {
-    try {
-        return await Html5Qrcode.getCameras();
-    } catch {
-        return [];
-    }
+    return [];
 }

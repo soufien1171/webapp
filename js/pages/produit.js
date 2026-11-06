@@ -204,7 +204,8 @@ export function renderProduitsPage() {
                         <div class="flex gap-1">
                             <input type="text" id="p-code" class="form-input flex-1 font-mono text-sm" 
                                 value="${existingProd?.code_barre || ''}" required ${isEdit ? 'readonly' : ''} />
-                            ${!isEdit ? `<button type="button" class="btn btn-secondary btn-sm btn-gen-ean" title="Générer code EAN-13">🎲 EAN</button><button type="button" class="btn btn-secondary btn-sm btn-scan-product" title="Scanner avec la caméra">📷 Scanner</button>` : ''}
+                            ${!isEdit ? `<button type="button" class="btn btn-secondary btn-sm btn-gen-ean" title="Générer code EAN-13">🎲 EAN</button>` : ''}
+                            <button type="button" class="btn btn-secondary btn-sm btn-scan-product" title="Scanner avec la caméra">📷 Scanner</button>
                         </div>
                         <div id="product-camera-wrapper" class="hidden mt-2">
                             <div id="product-camera-view" style="width:100%;max-width:480px;height:240px;min-height:200px;margin:0 auto"></div>
@@ -377,7 +378,7 @@ export function renderProduitsPage() {
 
                 try {
                     if (isEdit) {
-                        await produitRepo.update(code, data);
+                        await produitRepo.update(existingProd?.code_barre || code, data);
                         toast.success("Article mis à jour.");
                     } else {
                         await produitRepo.add(data);

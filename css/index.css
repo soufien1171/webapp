@@ -3057,7 +3057,7 @@ code {
     margin-left: 0;
     height: 100dvh;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
     padding-bottom: 0;
   }
 
@@ -3091,6 +3091,25 @@ code {
     -ms-overflow-style: none;
   }
 
+  .page-slot > * {
+    height: auto;
+    min-height: max-content;
+  }
+
+  .page-slot > .page-container,
+  .page-slot > .caisse-keyboard-view,
+  .page-slot > .caisse-touch-view,
+  .page-slot > .produits-page,
+  .page-slot > .employes-page,
+  .page-slot > .factures-page,
+  .page-slot > .fournisseurs-page,
+  .page-slot > .modifier-facture-page,
+  .page-slot > .parametres-page {
+    height: auto;
+    min-height: max-content;
+    overflow: visible;
+  }
+
   .page-slot::-webkit-scrollbar,
   .sidebar::-webkit-scrollbar,
   .table-responsive::-webkit-scrollbar {
@@ -3106,7 +3125,7 @@ code {
   .modifier-facture-page,
   .parametres-page {
     min-width: 0;
-    min-height: 0;
+    min-height: max-content;
   }
 
   .caisse-keyboard-view .caisse-topbar,

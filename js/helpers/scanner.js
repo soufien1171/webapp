@@ -1,6 +1,7 @@
-// Scanner Helper — Scanbot Web SDK RTU UI wrapper
+// Scanner Helper — Scanbot Web SDK Custom UI wrapper
 
 let scanbotSdkPromise = null;
+let scanner = null;
 let isScanning = false;
 let scanRequest = 0;
 
@@ -26,27 +27,52 @@ async function getScanbotSdk() {
 }
 
 /**
- * Start barcode scanning via camera
+ * Start barcode scanning via Scanbot Custom UI.
  * @param {string} containerId - DOM element ID for camera preview
  * @param {Function} onDetected - callback(decodedText)
  * @param {Object} options
  */
-export async function startScanning(_containerId, onDetected, _options = {}) {
+export async function startScanning(containerId, onDetected, options = {}) {
     if (isScanning) return;
     isScanning = true;
     const requestId = ++scanRequest;
     try {
-        await getScanbotSdk();
-        const config = new window.ScanbotSDK.UI.Config.BarcodeScannerScreenConfiguration();
-        const result = await window.ScanbotSDK.UI.createBarcodeScanner(config);
-        if (requestId !== scanRequest || !result?.items?.length) return;
-        const barcode = result.items[0]?.barcode;
-        if (barcode?.text) onDetected(barcode.text);
+        const sdk = await getScanbotSdk();
+        const configuration = {
+            containerId,
+            showFinder: true,
+            captureDelay: options.captureDelay || 1000,
+            videoConstraints: {
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                facingMode: 'environment'
+            },
+            onBarcodesDetected: (result) => {
+                if (requestId !== scanRequest) return;
+                const barcode = result?.barcodes?.[0];
+                if (!barcode?.text) return;
+
+                scanner?.dispose();
+                scanner = null;
+                isScanning = false;
+                onDetected(barcode.text);
+            },
+            onError: (error) => {
+                console.error('[Scanner] Scanbot camera error:', error);
+            }
+        };
+
+        const createdScanner = await sdk.createBarcodeScanner(configuration);
+        if (requestId !== scanRequest) {
+            createdScanner.dispose();
+            return;
+        }
+        scanner = createdScanner;
     } catch (error) {
         console.error('[Scanner] Scanbot failed:', error);
+        scanner = null;
+        isScanning = false;
         throw new Error('Impossible de démarrer le scanner. Vérifiez les permissions de la caméra.');
-    } finally {
-        if (requestId === scanRequest) isScanning = false;
     }
 }
 
@@ -55,6 +81,10 @@ export async function startScanning(_containerId, onDetected, _options = {}) {
  */
 export async function stopScanning() {
     scanRequest += 1;
+    if (scanner) {
+        scanner.dispose();
+        scanner = null;
+    }
     isScanning = false;
 }
 
@@ -69,5 +99,9 @@ export function isScannerActive() {
  * Get available cameras
  */
 export async function getCameras() {
-    return [];
+    try {
+        return scanner ? await scanner.fetchAvailableCameras() : [];
+    } catch {
+        return [];
+    }
 }

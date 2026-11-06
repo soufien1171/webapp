@@ -54,7 +54,7 @@ export function renderCaisseKeyboardPage() {
                 <span class="text-sm font-semibold">Caméra active — Visez le code-barres</span>
                 <button type="button" class="btn btn-ghost btn-sm btn-close-camera">&times;</button>
             </div>
-            <div id="camera-scanner-view" style="width: 100%; max-width: 480px; margin: 0 auto;"></div>
+            <div id="camera-scanner-view" style="width: 100%; max-width: 480px; height: min(38vh, 320px); min-height: 220px; margin: 0 auto;"></div>
         </div>
 
         <!-- Main Workspace (Cart table on left + Totals & Numpad on right) -->

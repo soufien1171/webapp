@@ -207,7 +207,7 @@ export function renderProduitsPage() {
                             ${!isEdit ? `<button type="button" class="btn btn-secondary btn-sm btn-gen-ean" title="Générer code EAN-13">🎲 EAN</button><button type="button" class="btn btn-secondary btn-sm btn-scan-product" title="Scanner avec la caméra">📷 Scanner</button>` : ''}
                         </div>
                         <div id="product-camera-wrapper" class="hidden mt-2">
-                            <div id="product-camera-view" style="width:100%;max-width:480px;margin:0 auto"></div>
+                            <div id="product-camera-view" style="width:100%;max-width:480px;height:240px;min-height:200px;margin:0 auto"></div>
                             <button type="button" class="btn btn-ghost btn-sm btn-stop-product-camera">Fermer la caméra</button>
                         </div>
                     </div>
